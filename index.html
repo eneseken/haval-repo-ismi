@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zentry Universe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #e8ff66;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+        }
+        
+        .header {
+            font-size: 24px;
+            margin-bottom: 60px;
+        }
+        
+        .content-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        
+        .articles-container {
+            position: relative;
+        }
+        
+        .article {
+            margin-bottom: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .article-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .article-number {
+            font-size: 16px;
+            color: #666;
+            width: 30px;
+        }
+        
+        .article-title {
+            font-size: 18px;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+        
+        .article-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+            opacity: 0;
+            margin-left: 30px;
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .article.active .article-title {
+            font-size: 32px;
+            color: #000;
+        }
+        
+        .article.active .article-content {
+            max-height: 300px;
+            opacity: 1;
+            transition: max-height 0.5s ease, opacity 0.5s ease;
+        }
+        
+        .article-text {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin-top: 15px;
+            flex: 1;
+        }
+        
+        .progress-container {
+            width: 2px;
+            height: 100px;
+            margin-top: 15px;
+            margin-right: 15px;
+            display: none;
+        }
+        
+        .article.active .progress-container {
+            display: block;
+        }
+        
+        .progress-bar {
+            width: 2px;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .progress-fill {
+            width: 100%;
+            background-color: #333;
+            position: absolute;
+            transition: height 0.3s, top 0.3s;
+        }
+        
+        .scroll-info {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(0,0,0,0.1);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">👑 https://kick.com/sanarberkebayram</div>
+        
+        <div class="content-wrapper">
+            <div class="articles-container">
+                <div class="article active" id="article1">
+                    <div class="article-header">
+                        <div class="article-number">01</div>
+                        <div class="article-title">Shaping Zentry Collectively</div>
+                    </div>
+                    <div class="article-content">
+                        <div class="progress-container" id="progress1">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill1"></div>
+                            </div>
+                        </div>
+                        <p class="article-text">Participate in governance, influence key decisions in the ever-growing Zentry Universe that is limited only by people's imaginations</p>
+                    </div>
+                </div>
+                
+                <div class="article" id="article2">
+                    <div class="article-header">
+                        <div class="article-number">02</div>
+                        <div class="article-title">Unlocking Economic Opportunity</div>
+                    </div>
+                    <div class="article-content">
+                        <div class="progress-container" id="progress2">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill2"></div>
+                            </div>
+                        </div>
+                        <p class="article-text">Discover new pathways to financial independence through the decentralized ecosystem of Zentry. Create, trade, and earn in ways previously unimaginable in traditional markets.</p>
+                    </div>
+                </div>
+                
+                <div class="article" id="article3">
+                    <div class="article-header">
+                        <div class="article-number">03</div>
+                        <div class="article-title">Sharing Value Accrued</div>
+                    </div>
+                    <div class="article-content">
+                        <div class="progress-container" id="progress3">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill3"></div>
+                            </div>
+                        </div>
+                        <p class="article-text">Benefit directly from the growth of the ecosystem through distributed value mechanisms that ensure all participants receive fair returns on their contributions and investments.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scroll-info">Scroll to navigate</div>
+    </div>
+
+    <script>
+        const articles = [
+            document.getElementById('article1'),
+            document.getElementById('article2'),
+            document.getElementById('article3')
+        ];
+        
+        const progressFills = [
+            document.getElementById('progressFill1'),
+            document.getElementById('progressFill2'),
+            document.getElementById('progressFill3')
+        ];
+        
+        let currentArticle = 0;
+        let currentProgress = 0;
+        const totalArticles = articles.length;
+        const totalSections = 4; // Each article has 4 progress sections
+        let scrollDirection = 'down'; // Track the current scroll direction
+        
+        // Wheel scroll sensitivity
+        const scrollThreshold = 5;
+        let scrollAccumulator = 0;
+        
+        // Initialize first article
+        articles[0].classList.add('active');
+        updateProgress(0);
+        
+        function updateProgress(articleIndex) {
+            const progressPercentage = (currentProgress + 1) / totalSections * 100;
+            const progressFill = progressFills[articleIndex];
+            
+            if (scrollDirection === 'down') {
+                // When scrolling down, fill from top
+                progressFill.style.top = '0';
+                progressFill.style.height = `${progressPercentage}%`;
+            } else {
+                // When scrolling up, fill from bottom
+                progressFill.style.top = `${100 - progressPercentage}%`;
+                progressFill.style.height = `${progressPercentage}%`;
+            }
+        }
+        
+        function resetAllProgress() {
+            // Reset all progress bars
+            for (let i = 0; i < progressFills.length; i++) {
+                progressFills[i].style.height = '0%';
+            }
+        }
+        
+        function nextStep() {
+            scrollDirection = 'down';
+            if (currentProgress < totalSections - 1) {
+                // Advance progress within current article
+                currentProgress++;
+                updateProgress(currentArticle);
+                return true;
+            } else if (currentArticle < totalArticles - 1) {
+                // Move to next article
+                articles[currentArticle].classList.remove('active');
+                currentArticle++;
+                currentProgress = 0;
+                articles[currentArticle].classList.add('active');
+                updateProgress(currentArticle);
+                return true;
+            }
+            return false;
+        }
+        
+        function prevStep() {
+            scrollDirection = 'up';
+            if (currentProgress > 0) {
+                // Decrease progress within current article
+                currentProgress--;
+                updateProgress(currentArticle);
+                return true;
+            } else if (currentArticle > 0) {
+                // Move to previous article
+                articles[currentArticle].classList.remove('active');
+                currentArticle--;
+                currentProgress = totalSections - 1;
+                articles[currentArticle].classList.add('active');
+                updateProgress(currentArticle);
+                return true;
+            }
+            return false;
+        }
+        
+        // Handle mouse wheel scroll events
+        window.addEventListener('wheel', (event) => {
+            event.preventDefault();
+            
+            // Accumulate scroll amount to create a smoother experience
+            scrollAccumulator += event.deltaY;
+            
+            if (scrollAccumulator > scrollThreshold) {
+                if (nextStep()) {
+                    scrollAccumulator = 0;
+                }
+            } else if (scrollAccumulator < -scrollThreshold) {
+                if (prevStep()) {
+                    scrollAccumulator = 0;
+                }
+            }
+        }, { passive: false });
+        
+        // Handle article clicks
+        articles.forEach((article, index) => {
+            article.addEventListener('click', () => {
+                if (index !== currentArticle) {
+                    articles[currentArticle].classList.remove('active');
+                    currentArticle = index;
+                    currentProgress = 0;
+                    scrollDirection = 'down'; // Reset direction to down when clicking
+                    articles[currentArticle].classList.add('active');
+                    
+                    // Reset all progress and start fresh
+                    resetAllProgress();
+                    updateProgress(currentArticle);
+                }
+            });
+        });
+        
+        // Handle touch events for mobile
+        let touchStartY = 0;
+        let touchEndY = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            touchStartY = e.changedTouches[0].screenY;
+        }, false);
+        
+        document.addEventListener('touchend', (e) => {
+            touchEndY = e.changedTouches[0].screenY;
+            handleSwipe();
+        }, false);
+        
+        function handleSwipe() {
+            const touchThreshold = 50;
+            if (touchStartY - touchEndY > touchThreshold) {
+                // Swipe up
+                nextStep();
+            } else if (touchEndY - touchStartY > touchThreshold) {
+                // Swipe down
+                prevStep();
+            }
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                nextStep();
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                prevStep();
+            }
+        });
+        
+        // Auto-start by showing content of first article
+        setTimeout(() => {
+            scrollDirection = 'down';
+            updateProgress(currentArticle);
+        }, 500);
+    </script>
+</body>
+</html>
